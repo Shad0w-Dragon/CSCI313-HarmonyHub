@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Delete Artist: {{ artist }}</h1>
+
+{% if artist.song_set.all %}
+
+<p>You can't delete this artist until all their songs have been deleted:</p>
+<ul>
+  {% for song in artist.song_set.all %}
+    <li><a href="{% url 'song-detail' song.pk %}">{{ song }}</a></li>
+  {% endfor %}
+</ul>
+
+{% else %}
+<p>Are you sure you want to delete the artist?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Yes, delete">
+</form>
+{% endif %}
+
+{% endblock %}

@@ -2,13 +2,15 @@
 
 {% block content %}
 
-<h1>Delete Language: {{ language }}</h1>
+<h1>Delete Song</h1>
 
-<p>Are you sure you want to delete the language?</p>
+{% if song %}
+<p>Are you sure you want to delete the song: {{ song }}?</p>
 
 <form action="" method="POST">
   {% csrf_token %}
   <input type="submit" action="" value="Yes, delete.">
 </form>
+{% endif %}
 
 {% endblock %}

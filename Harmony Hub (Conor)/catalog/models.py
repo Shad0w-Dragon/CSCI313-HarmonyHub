@@ -47,7 +47,12 @@ class Song(models.Model):
 
     def display_genre(self):
         """Creates a string for the Genre. This is required to display genre in Admin."""
-        return ', '.join([genre.name for genre in self.genre.all()[:3]])
+        if self.genre:
+            return self.genre.name
+        else:
+            return "No genre"
+
+    display_genre.short_description = 'Genre'
 
     display_genre.short_description = 'Genre'
 
@@ -82,3 +87,4 @@ class Artist(models.Model):
     def __str__(self):
         """String representation of the model object."""
         return self.name
+    

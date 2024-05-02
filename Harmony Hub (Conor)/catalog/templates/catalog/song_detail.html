@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Title: {{ song.title }}</h1>
+
+<p><strong>Artist:</strong> <a href="{{ song.artist.get_absolute_url }}">{{ song.artist }}</a></p>
+<p><strong>Summary:</strong> {{ song.summary }}</p>
+<p><strong>Release Date:</strong> {{ song.release_date }}</p>
+<p><strong>Genre:</strong> {{ song.genre }}</p>
+<p><strong>Length:</strong> {{ song.length }}</p>
+
+<p>This song is available for listening anytime.</p>
+
+{% endblock %}
+
+
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if perms.catalog.change_song or perms.catalog.delete_song %}
+  <hr>
+  <ul class="sidebar-nav">
+    {% if perms.catalog.change_song %}
+      <li><a href="{% url 'song-update' song.id %}">Update Song</a></li>
+    {% endif %}
+    {% if perms.catalog.delete_song %}
+      <li><a href="{% url 'song-delete' song.id %}">Delete Song</a></li>
+    {% endif %}
+    </ul>
+  {% endif %}
+
+{% endblock %}
