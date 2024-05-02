@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Local Music Catalog Home</h1>
+
+<p>Welcome to <em>Harmony Hub</em>!</p>
+<p>Please enjoy your music</p>
+
+
+
+<h2>Stored content</h2>
+
+<p>The service has the following records:</p>
+<ul>
+<li><strong>Songs:</strong> {{ num_songs }}</li> <!-- Updated -->
+<li><strong>Artists:</strong> {{ num_artists }}</li> <!-- Updated -->
+<li><strong>Genres:</strong> {{ num_genres }}</li> <!-- Updated -->
+</ul>
+
+{% endblock %}
