@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Artist, Genre, Song
+from .models import Artist, Genre, Song, Album
 
 # Register your models here.
 
@@ -23,4 +23,4 @@ class SongAdmin(admin.ModelAdmin):
     list_display = ('title', 'artist', 'release_date', 'display_genre', 'length')
     # Add any other configurations as needed
 
-
+admin.site.register(Album)
