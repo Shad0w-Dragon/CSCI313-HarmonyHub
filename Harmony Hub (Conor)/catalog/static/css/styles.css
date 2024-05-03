@@ -4,6 +4,8 @@
     list-style: none;
 }
 
+body {background-color: gray;}
+
 #logout-form {
   display: inline;
 }
