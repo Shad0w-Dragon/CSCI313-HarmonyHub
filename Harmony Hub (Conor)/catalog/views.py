@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Artist, Song, Genre, Favorite, CustomUser
-from .forms import SignUpForm
+from .models import Artist, Song, Genre, Favorite, CustomUser, Album
+from .forms import SignUpForm, AlbumForm
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -10,6 +10,14 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from .models import Album
+from .forms import AlbumForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import DetailView
+from django.shortcuts import get_object_or_404
+from .models import Song
+from django.views.generic import ListView
 
 
 def index(request):
@@ -17,13 +25,14 @@ def index(request):
     num_songs = Song.objects.all().count()
     num_artists = Artist.objects.all().count()
     num_genres = Genre.objects.all().count()
+    num_albums = Album.objects.all().count()
     num_visits = request.session.get('num_visits', 1)
     request.session['num_visits'] = num_visits + 1
     return render(
         request,
         'index.html',
         context={'num_songs': num_songs, 'num_artists': num_artists,
-                 'num_genres': num_genres, 'num_visits': num_visits},
+                 'num_genres': num_genres, 'num_albums': num_albums, 'num_visits': num_visits},
     )
 
 
@@ -32,15 +41,22 @@ class SongListView(generic.ListView):
     model = Song
     paginate_by = 10
 
-
-class SongDetailView(generic.DetailView):
+class SongDetailView(LoginRequiredMixin, DetailView):
     """Generic class-based detail view for a song."""
     model = Song
+    template_name = 'catalog/song_detail.html'  # Adjust the template name as per your project structure
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_favorite'] = Favorite.objects.filter(user=self.request.user, song=self.object).exists()
-        return context
+    def get_object(self, queryset=None):
+        # Get the song object
+        song = super().get_object(queryset=queryset)
+        
+        # Check if the user is authenticated or is a CustomUser
+        if self.request.user.is_authenticated or isinstance(self.request.user, CustomUser):
+            # If the user is authenticated or is a CustomUser, return the song
+            return song
+        else:
+            # If the user is not authenticated and is not a CustomUser, return a 404 error
+            raise Http404("Song not found")
 
 
 class ArtistListView(generic.ListView):
@@ -67,12 +83,12 @@ class GenreDetailView(generic.DetailView):
 
 class SongCreate(CreateView):
     model = Song
-    fields = ['title', 'artist', 'release_date', 'genre', 'length']
+    fields = ['title', 'artist', 'release_date', 'genre', 'length', 'album']
 
 
 class SongUpdate(UpdateView):
     model = Song
-    fields = ['title', 'artist', 'release_date', 'genre', 'length']
+    fields = ['title', 'artist', 'release_date', 'genre', 'length', 'album']
 
 
 class SongDelete(DeleteView):
@@ -130,6 +146,17 @@ def remove_from_favorites(request, song_id):
     return redirect('index') 
 
 
+@login_required
+def create_album(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')  # Redirect to the home page after successful album creation
+    else:
+        form = AlbumForm()
+    return render(request, 'catalog/album_form.html', {'form': form})
+
 
 def signup(request):
     if request.method == 'POST':
@@ -150,3 +177,28 @@ def create_account(request):
     else:
         form = SignUpForm()
     return render(request, 'registration/create_account.html', {'form': form})
+
+
+
+class AlbumCreateView(CreateView):
+    model = Album
+    form_class = AlbumForm
+    template_name = 'catalog/album_create.html' 
+    success_url = '/'
+    
+class AlbumListView(ListView):
+    model = Album
+    template_name = 'catalog/album_list.html'
+    context_object_name = 'albums'
+
+
+class AlbumDetailView(DetailView):
+    model = Album
+    template_name = 'catalog/album_detail.html' 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        album = self.get_object()
+        artist = album.artist  # Get the artist associated with the album
+        context['songs'] = Song.objects.filter(artist=artist)  # Get all songs from the artist
+        return context

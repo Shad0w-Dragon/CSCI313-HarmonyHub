@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import AlbumListView, AlbumDetailView 
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -22,4 +23,7 @@ urlpatterns = [
     path('remove_from_favorites/<int:song_id>/', views.remove_from_favorites, name='remove-from-favorites'),
     path('accounts/signup/', views.signup, name='signup'),
     path('accounts/create/', views.create_account, name='create_account'), 
+    path('album/create/', views.AlbumCreateView.as_view(), name='album-create'),
+    path('albums/', AlbumListView.as_view(), name='albums'),
+    path('album/<int:pk>/', AlbumDetailView.as_view(), name='album-detail'), 
 ]

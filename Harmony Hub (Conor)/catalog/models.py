@@ -3,12 +3,9 @@ from django.urls import reverse
 from django.db.models import UniqueConstraint
 from django.db.models.functions import Lower
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import AbstractUser, Group
-from django.contrib.auth.models import AbstractUser, Permission
+from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
-
-
-
+from django.views.generic import DetailView
 
 
 class Genre(models.Model):
@@ -41,7 +38,6 @@ class Song(models.Model):
     """Model representing a song."""
     title = models.CharField(max_length=200)
     artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
-    # Foreign Key used because a song can have only one artist, but artists can have multiple songs.
     release_date = models.DateField(null=True, blank=True)
     genre = models.ForeignKey(
         Genre, on_delete=models.RESTRICT, null=True, help_text="Select a genre for this song")
@@ -113,34 +109,33 @@ class CustomUser(AbstractUser):
         return self.username
     
     class Meta(AbstractUser.Meta):
-        # Add a unique related_name argument to prevent clashes with the default User model
         pass
 
-    # Specify unique related_name arguments for groups and user_permissions fields
     groups = models.ManyToManyField(
         Group,
         verbose_name=_('groups'),
         blank=True,
-        related_name='custom_user_groups'  # Unique related_name for groups
+        related_name='custom_user_groups'
     )
     user_permissions = models.ManyToManyField(
         Permission,
         verbose_name=_('user permissions'),
         blank=True,
-        related_name='custom_user_permissions'  # Unique related_name for user_permissions
+        related_name='custom_user_permissions'
     )
+
 
 class Album(models.Model):
     """Model representing an album."""
     name = models.CharField(max_length=255)
     common_genre = models.CharField(max_length=100)
-    artist = models.ForeignKey('Album', on_delete=models.CASCADE, help_text="Enter album artist here")
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, help_text="Select album artist")
 
     class Meta:
         ordering = ['name']
 
     def get_absolute_url(self):
-        """Returns the URL to access a particular artist instance."""
+        """Returns the URL to access a particular album instance."""
         return reverse('album-detail', args=[str(self.id)])
 
     def __str__(self):
