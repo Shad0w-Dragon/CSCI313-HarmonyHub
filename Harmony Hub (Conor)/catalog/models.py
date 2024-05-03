@@ -134,14 +134,14 @@ class Album(models.Model):
     """Model representing an album."""
     name = models.CharField(max_length=255)
     common_genre = models.CharField(max_length=100)
-    artist = models.ForeignKey('Album', on_delete=models.CASCADE, help_test="Enter album artist here")
+    artist = models.ForeignKey('Album', on_delete=models.CASCADE, help_text="Enter album artist here")
 
     class Meta:
         ordering = ['name']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular artist instance."""
-        return reverse('artist-detail', args=[str(self.id)])
+        return reverse('album-detail', args=[str(self.id)])
 
     def __str__(self):
         """String representation of the model object."""
