@@ -1,0 +1,29 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h2>Create an Account</h2>
+
+<form method="post" action="{% url 'signup' %}">
+  {% csrf_token %}
+  <table>
+    <tr>
+      <td>{{ form.username.label_tag }}</td>
+      <td>{{ form.username }}</td>
+    </tr>
+    <tr>
+      <td>{{ form.password1.label_tag }}</td>
+      <td>{{ form.password1 }}</td>
+    </tr>
+    <tr>
+      <td>{{ form.password2.label_tag }}</td>
+      <td>{{ form.password2 }}</td>
+    </tr>
+  </table>
+
+  <input type="submit" value="Create Account">
+</form>
+
+<a href="{% url 'index' %}">Back to Main Page</a>
+
+{% endblock %}

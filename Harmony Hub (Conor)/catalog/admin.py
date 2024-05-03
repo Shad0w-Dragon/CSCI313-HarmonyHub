@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Artist, Genre, Song, Album
+from .models import Artist, Genre, Song
 
 # Register your models here.
 
@@ -24,4 +24,3 @@ class SongAdmin(admin.ModelAdmin):
     # Add any other configurations as needed
 
 
-admin.site.register(Album)
