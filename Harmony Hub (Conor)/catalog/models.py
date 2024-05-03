@@ -41,6 +41,7 @@ class Song(models.Model):
     genre = models.ForeignKey(
         Genre, on_delete=models.RESTRICT, null=True, help_text="Select a genre for this song")
     length = models.DurationField(null=True, blank=True, help_text="Duration of the song")
+    album = models.ForeignKey('Album', on_delete=models.CASCADE, null=True, help_text="Select the album this song belongs to")
 
     class Meta:
         ordering = ['title']
@@ -88,3 +89,19 @@ class Artist(models.Model):
         """String representation of the model object."""
         return self.name
     
+class Album(models.Model):
+    """Model representing an artist."""
+    name = models.CharField(max_length=255)
+    common_genre = models.CharField(max_length=100)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['name']
+
+    def get_absolute_url(self):
+        """Returns the URL to access a particular artist instance."""
+        return reverse('album-detail', args=[str(self.id)])
+
+    def __str__(self):
+        """String representation of the model object."""
+        return self.name
